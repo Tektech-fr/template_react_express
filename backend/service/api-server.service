@@ -1,0 +1,15 @@
+[Unit]
+Description=API Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/work/backend
+EnvironmentFile=/var/www/work/backend/.env
+ExecStart=/usr/bin/node /var/www/work/backend/dist/index.js
+Restart=on-failure
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
