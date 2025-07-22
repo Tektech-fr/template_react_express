@@ -3,15 +3,12 @@ import express from "express";
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
-// Charger les variables d'environnement
 dotenv.config();
 
-// Constants
 const isProduction = process.env.NODE_ENV === "production";
 const port = process.env.PORT || 5173;
 const base = process.env.BASE || "/";
 
-// Cached production assets
 const templateHtml = isProduction
   ? await fs.readFile("./dist/client/index.html", "utf-8")
   : "";
@@ -68,7 +65,6 @@ app.use("*all", async (req, res) => {
     /** @type {import('./src/entry-server.ts').render} */
     let render;
     if (!isProduction) {
-      // Always read fresh template in development
       template = await fs.readFile("./index.html", "utf-8");
       template = await vite.transformIndexHtml(url, template);
       render = (await vite.ssrLoadModule("/src/entry-server.tsx")).render;
@@ -77,7 +73,6 @@ app.use("*all", async (req, res) => {
       render = (await import("./dist/server/entry-server.js")).render;
     }
 
-    // const rendered = await render(url);
     const rendered = await render(url, { users });
 
     const html = template
@@ -98,7 +93,6 @@ app.use("*all", async (req, res) => {
   }
 });
 
-// Start http server
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });

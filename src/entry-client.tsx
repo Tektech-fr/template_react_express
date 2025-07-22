@@ -3,7 +3,6 @@ import { hydrateRoot } from "react-dom/client";
 import App from "./App";
 import { User } from "./types";
 
-// S'assurer que le DOM est chargé et que les données sont disponibles
 function initializeApp() {
   const initialData = (window as any).__INITIAL_DATA__ as
     | { users: User[] }
@@ -20,7 +19,6 @@ function initializeApp() {
   );
 }
 
-// Attendre que le DOM soit prêt et les données injectées
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeApp);
 } else {

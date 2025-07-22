@@ -5,10 +5,7 @@ interface AppProps {
 }
 
 function App({ initialUsers = [] }: AppProps) {
-  // Plus de useState - on utilise directement les props
   const users = initialUsers;
-
-  console.log("App rendering with users:", users); // Debug
 
   return (
     <>
