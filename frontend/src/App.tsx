@@ -1,56 +1,26 @@
-import React, { useState } from "react";
-import { login, fetchData } from "./api";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-const App: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [token, setToken] = useState<string | null>(null);
-  const [data, setData] = useState<any[]>([]);
+type Item = { id: number; info: string };
 
-  const handleLogin = async () => {
-    try {
-      const res = await login(username, password);
-      setToken(res.data.token);
-    } catch {
-      alert("Login failed");
-    }
-  };
+export default function App() {
+  const [items, setItems] = useState<Item[]>([]);
 
-  const handleFetch = async () => {
-    if (!token) return;
-    try {
-      const res = await fetchData(token);
-      setData(res.data);
-    } catch {
-      alert("Fetch failed");
-    }
-  };
+  useEffect(() => {
+    axios
+      .get("/api/data")
+      .then((res) => setItems(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <div style={{ padding: "2rem" }}>
-      {!token ? (
-        <div>
-          <input
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button onClick={handleLogin}>Login</button>
-        </div>
-      ) : (
-        <div>
-          <button onClick={handleFetch}>Fetch Data</button>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )}
+      <h1>Items</h1>
+      <ul>
+        {items.map((i) => (
+          <li key={i.id}>{i.info}</li>
+        ))}
+      </ul>
     </div>
   );
-};
-
-export default App;
+}

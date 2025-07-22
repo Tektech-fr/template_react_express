@@ -1,23 +1,18 @@
 import express from "express";
 import cors from "cors";
+import { pool } from "./db";
 import dotenv from "dotenv";
-import authRoutes from "./routes/auth";
-import dataRoutes from "./routes/data";
-import { verifyToken } from "./middleware/auth";
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 4000;
+const port = +process.env.PORT!;
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
-app.use(
-  cors({
-    origin: "https://work.tektech.fr",
-    credentials: true,
-  })
-);
-app.use(express.json());
+app.use(cors({ origin: allowedOrigins }));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/data", verifyToken, dataRoutes);
+app.get("/api/data", async (req, res) => {
+  const [rows] = await pool.query("SELECT * FROM users");
+  res.json(rows);
+});
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(port, () => console.log(`API running on port ${port}`));
