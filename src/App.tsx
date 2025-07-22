@@ -1,29 +1,14 @@
-import { useEffect, useState } from "react";
+import { User } from "./types";
 
-type User = {
-  id: number;
-  first_name: string;
-  last_name: string;
-};
+interface AppProps {
+  initialUsers?: User[];
+}
 
-function App() {
-  const [users, setUsers] = useState<User[]>([]);
+function App({ initialUsers = [] }: AppProps) {
+  // Plus de useState - on utilise directement les props
+  const users = initialUsers;
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/users");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
+  console.log("App rendering with users:", users); // Debug
 
   return (
     <>

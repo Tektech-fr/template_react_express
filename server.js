@@ -44,22 +44,24 @@ const pool = mysql.createPool({
   connectionLimit: 5,
 });
 
-app.get("/api/users", async (_req, res) => {
+async function fetchUsersFromDB() {
   try {
     const [rows] = await pool.query(
       "SELECT id, first_name, last_name FROM users;"
     );
-    res.json(rows);
+    return rows;
   } catch (err) {
     console.error("DB error:", err);
-    res.status(500).json({ error: "Erreur interne du serveur" });
+    return [];
   }
-});
+}
 
 // Serve HTML
 app.use("*all", async (req, res) => {
   try {
     const url = req.originalUrl.replace(base, "");
+
+    const users = await fetchUsersFromDB();
 
     /** @type {string} */
     let template;
@@ -75,11 +77,18 @@ app.use("*all", async (req, res) => {
       render = (await import("./dist/server/entry-server.js")).render;
     }
 
-    const rendered = await render(url);
+    // const rendered = await render(url);
+    const rendered = await render(url, { users });
 
     const html = template
       .replace(`<!--app-head-->`, rendered.head ?? "")
-      .replace(`<!--app-html-->`, rendered.html ?? "");
+      .replace(`<!--app-html-->`, rendered.html ?? "")
+      .replace(
+        `<!--app-data-->`,
+        `<script>window.__INITIAL_DATA__ = ${JSON.stringify({
+          users,
+        })}</script>`
+      );
 
     res.status(200).set({ "Content-Type": "text/html" }).send(html);
   } catch (e) {
